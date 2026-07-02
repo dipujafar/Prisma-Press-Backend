@@ -6,7 +6,7 @@ import bcrypt from "bcryptjs";
 const registerUserInDB = async (payload: RegisterUserPayload) => {
   const { name, email, password, profilePhoto } = payload;
 
-  const isUserExit = await prisma.uSER.findUnique({
+  const isUserExit = await prisma.user.findUnique({
     where: { email },
   });
 
@@ -19,7 +19,7 @@ const registerUserInDB = async (payload: RegisterUserPayload) => {
     Number(config.bcrypt_salt_rounds),
   );
 
-  const createdUser = await prisma.uSER.create({
+  const createdUser = await prisma.user.create({
     data: {
       name,
       email,
@@ -34,7 +34,7 @@ const registerUserInDB = async (payload: RegisterUserPayload) => {
 
   
 
-  const user = await prisma.uSER.findUnique({
+  const user = await prisma.user.findUnique({
     where: {
       id: createdUser.id,
       email: createdUser.email || email,
@@ -50,6 +50,6 @@ const registerUserInDB = async (payload: RegisterUserPayload) => {
   return user;
 };
 
-export const UserService = {
+export const userService = {
   registerUserInDB,
 };

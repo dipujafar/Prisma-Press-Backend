@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
-import { UserService } from "./user.service";
 import httpStatus from "http-status";
 import { catchAsync } from "../../utils/catchAsync";
 import { sendResponse } from "../../lib/sendResponse";
+import { userService } from "./user.service";
 
 // const userRegister = async (req: Request, res: Response) => {
 //   try {
@@ -29,7 +29,7 @@ import { sendResponse } from "../../lib/sendResponse";
 const userRegister = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const payload = req.body;
-    const user = await UserService.registerUserInDB(payload);
+    const user = await userService.registerUserInDB(payload);
 
     sendResponse(res, {
       success: true,
@@ -42,6 +42,6 @@ const userRegister = catchAsync(
   },
 );
 
-export const UserController = {
+export const userController = {
   userRegister,
 };

@@ -2,10 +2,8 @@ import cookieParser from "cookie-parser";
 import express, { Application, Request, Response } from "express";
 import cors from "cors";
 import config from "./config";
-import { prisma } from "./lib/prisma";
-import httpStatus from "http-status";
-import bcrypt from "bcryptjs";
-import { UserRoutes } from "./modules/user/user.route";
+import { authRoutes } from "./modules/auth/auth.route";
+import { userRoutes } from "./modules/user/user.route";
 
 const app: Application = express();
 
@@ -23,6 +21,7 @@ app.get("/", async (req: Request, res: Response) => {
   res.send("Hello World!");
 });
 
-app.use("/api/users", UserRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/auth", authRoutes);
 
 export default app;
