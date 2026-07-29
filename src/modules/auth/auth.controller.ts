@@ -10,14 +10,14 @@ const loginUser = catchAsync(async (req:Request, res: Response, next: NextFuncti
 
     res.cookie("accessToken", accessToken, {
         httpOnly: true,
-        secure: true,
+        secure: false,
         sameSite: "none",
         maxAge: 24 * 60 * 60 * 24 * 7
     })
 
     res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
-        secure: true,
+        secure: false,
         sameSite: "none",
         maxAge: 24 * 60 * 60 * 24 * 30
     })

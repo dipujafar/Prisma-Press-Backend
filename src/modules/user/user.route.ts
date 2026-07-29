@@ -5,4 +5,6 @@ const router= Router();
 
 router.post('/register', userController.userRegister);
 
+router.get('/me', userController.getMyProfile);
+
 export const userRoutes= router;
