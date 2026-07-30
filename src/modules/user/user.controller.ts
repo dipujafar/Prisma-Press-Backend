@@ -3,9 +3,6 @@ import httpStatus from "http-status";
 import { catchAsync } from "../../utils/catchAsync";
 import { sendResponse } from "../../lib/sendResponse";
 import { userService } from "./user.service";
-import jwt from "jsonwebtoken";
-import config from "../../config";
-import { jwtUtils } from "../../utils/jwt";
 
 // const userRegister = async (req: Request, res: Response) => {
 //   try {
@@ -46,19 +43,7 @@ const userRegister = catchAsync(
 );
 
 const getMyProfile = catchAsync(async (req: Request, res: Response) => {
-  const { accessToken } = req.cookies;
-  // console.log(accessToken);
-
-  const verifiedToken = jwtUtils.verifyToken(
-    accessToken,
-    config.jwt_access_secret,
-  );
-
-  if (typeof verifiedToken === "string") {
-    throw new Error(verifiedToken);
-  }
-
-  const profile = await userService.getMyProfileFromDB(verifiedToken.id);
+  const profile = await userService.getMyProfileFromDB(req.user.id as string);
 
   sendResponse(res, {
     success: true,
@@ -70,7 +55,24 @@ const getMyProfile = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const updateMyProfile = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.user.id as string;
+  const payload = req.body;
+
+  const updatedUser = await userService.updateMyProfile(userId, payload);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "User profile updated successfully",
+    data: {
+      updatedUser,
+    },
+  });
+});
+
 export const userController = {
   userRegister,
   getMyProfile,
+  updateMyProfile,
 };
