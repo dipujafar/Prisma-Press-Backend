@@ -3,6 +3,7 @@ import { catchAsync } from "../../utils/catchAsync";
 import { postService } from "./post.service";
 import { sendResponse } from "../../lib/sendResponse";
 import httpStatus from "http-status";
+import { Role } from "../../../generated/prisma/enums";
 
 const createPost = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -35,15 +36,59 @@ const getAllPosts = catchAsync(
 );
 
 const getPostById = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {},
+  async (req: Request, res: Response, next: NextFunction) => {
+    const id = req.params.postId;
+    const result = await postService.getPostById(id as string);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Post retrieved successfully",
+      data: result,
+    });
+  },
 );
 
 const updatePost = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {},
+  async (req: Request, res: Response, next: NextFunction) => {
+    const postId = req.params.postId;
+    const payload = req.body;
+    const authorId = req.user?.id;
+    const isAdmin = req.user?.role === Role.ADMIN;
+    const result = await postService.updatePost(
+      postId as string,
+      payload,
+      authorId as string,
+      isAdmin,
+    );
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Post updated successfully",
+      data: result,
+    });
+  },
 );
 
 const deletePost = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {},
+  async (req: Request, res: Response, next: NextFunction) => {
+     const postId = req.params.postId;
+    const authorId = req.user?.id;
+    const isAdmin = req.user?.role === Role.ADMIN;
+    const result = await postService.deletePost(
+      postId as string,
+      authorId as string,
+      isAdmin,
+    );
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Post deleted successfully",
+      data: result,
+    });
+  },
 );
 
 const getPostStats = catchAsync(
@@ -51,7 +96,18 @@ const getPostStats = catchAsync(
 );
 
 const getMyPosts = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {},
+  async (req: Request, res: Response, next: NextFunction) => {
+    const authorId = req.user?.id;
+
+    const result = await postService.getMyPosts(authorId as string);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Posts retrieved successfully",
+      data: result,
+    });
+  },
 );
 
 export const postController = {

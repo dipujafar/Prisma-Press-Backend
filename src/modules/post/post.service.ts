@@ -27,15 +27,110 @@ const getAllPosts = async () => {
   return result;
 };
 
-const getPostById = async (id: string) => {};
+const getPostById = async (id: string) => {
+  const post = await prisma.post.findUniqueOrThrow({
+    where: { id },
+  });
 
-const updatePost = async (id: string) => {};
+  const updatedPost = await prisma.post.update({
+    where: { id },
+    data: {
+      views: {
+        increment: 1,
+      },
+    },
 
-const deletePost = async (id: string) => {};
+    include: {
+      author: {
+        omit: {
+          password: true,
+        },
+      },
+      comments: true,
+    },
+  });
+
+  return updatedPost;
+};
+
+const updatePost = async (
+  postId: string,
+  payload: Partial<ICreatePostPayload>,
+  authorId: string,
+  isAdmin: boolean,
+) => {
+  const post = await prisma.post.findUniqueOrThrow({
+    where: { id: postId },
+  });
+
+  if (post.authorId !== authorId && !isAdmin) {
+    throw new Error("You are not authorized to update this post");
+  }
+
+  const result = await prisma.post.update({
+    where: { id: postId },
+    data: payload,
+    include: {
+      author: {
+        omit: {
+          password: true,
+        },
+      },
+      comments: true,
+    },
+  });
+
+  return result;
+};
+
+const deletePost = async (
+  postId: string,
+  authorId: string,
+  isAdmin: boolean,
+) => {
+  const post = await prisma.post.findUniqueOrThrow({
+    where: { id: postId },
+  });
+
+  if (post.authorId !== authorId && !isAdmin) {
+    throw new Error("You are not authorized to update this post");
+  }
+
+  const result = await prisma.post.delete({
+    where: { id: postId },
+  });
+
+  return result;
+};
 
 const getPostStats = async () => {};
 
-const getMyPosts = async () => {};
+const getMyPosts = async (authorId: string) => {
+  const result = await prisma.post.findMany({
+    where: {
+      authorId,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+    include: {
+      author: {
+        omit: {
+          password: true,
+        },
+      },
+      comments: true,
+
+      _count: {
+        select: {
+          comments: true,
+        },
+      },
+    },
+  });
+
+  return result;
+};
 
 export const postService = {
   createPost,
