@@ -15,6 +15,21 @@ const createPost = async (payload: ICreatePostPayload, userId: string) => {
 
 const getAllPosts = async () => {
   const result = await prisma.post.findMany({
+    where: {
+      AND: [
+        {
+          title: "My third Post",
+        },
+        {
+          content: "CR7",
+        },
+        {
+          tags: {
+            has: "prisma",
+          },
+        },
+      ],
+    },
     include: {
       author: {
         omit: {
@@ -135,35 +150,35 @@ const getPostStats = async () => {
       totalRejectedComments,
       totalPostViewsAggregate,
     ] = await Promise.all([
-       tx.post.count(),
-       tx.post.count({
+      tx.post.count(),
+      tx.post.count({
         where: {
           status: PostStatus.PUBLISHED,
         },
       }),
-       tx.post.count({
+      tx.post.count({
         where: {
           status: PostStatus.DRAFT,
         },
       }),
-       tx.post.count({
+      tx.post.count({
         where: {
           status: PostStatus.ARCHIVED,
         },
       }),
-       tx.comment.count(),
-       tx.comment.count({
+      tx.comment.count(),
+      tx.comment.count({
         where: {
           status: CommentStatus.APPROVED,
         },
       }),
-       tx.comment.count({
+      tx.comment.count({
         where: {
           status: CommentStatus.REJECT,
         },
       }),
 
-       tx.post.aggregate({
+      tx.post.aggregate({
         _sum: {
           views: true,
         },

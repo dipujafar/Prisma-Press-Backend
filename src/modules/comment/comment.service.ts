@@ -9,6 +9,7 @@ const createComment = async (
   authorId: string,
   payload: ICreateCommentPayload,
 ) => {
+  console.log("Hit")
   await prisma.post.findUniqueOrThrow({
     where: { id: payload.postId },
   });
