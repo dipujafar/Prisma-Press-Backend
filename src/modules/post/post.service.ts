@@ -13,7 +13,8 @@ const createPost = async (payload: ICreatePostPayload, userId: string) => {
   return result;
 };
 
-const getAllPosts = async () => {
+const getAllPosts = async (query: any) => {
+  console.log(query);
   const result = await prisma.post.findMany({
     // where: {
     //   AND: [
@@ -80,7 +81,7 @@ const getAllPosts = async () => {
       },
       {
         content: "desc",
-      }
+      },
     ],
 
     include: {
