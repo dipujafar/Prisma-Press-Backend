@@ -4,11 +4,14 @@ model Subscription {
     userId String @unique
     user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    currentPeriod DateTime
-    status        SubscriptionStatus @default(ACTIVE)
+    currentPeriodEnd DateTime
+    status           SubscriptionStatus @default(ACTIVE)
 
     // stripe customer id
     stripeCustomerId String @unique
+
+    // stripe subscription id
+    stripeSubscriptionId String @unique
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

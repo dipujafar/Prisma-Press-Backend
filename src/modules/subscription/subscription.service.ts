@@ -50,6 +50,9 @@ const createCheckoutSession = async (userId: string) => {
   };
 };
 
+const handleWebhook = async (event: Buffer, signature: string) => {};
+
 export const subscriptionService = {
   createCheckoutSession,
+  handleWebhook,
 };

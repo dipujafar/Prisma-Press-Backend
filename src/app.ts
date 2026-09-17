@@ -6,7 +6,6 @@ import { authRoutes } from "./modules/auth/auth.route";
 import { userRoutes } from "./modules/user/user.route";
 import { postRoutes } from "./modules/post/post.route";
 import { commentRoutes } from "./modules/comment/comment.route";
-import httpStatus from "http-status";
 import { notFound } from "./middleware/notFount";
 import { globalErrorHandle } from "./middleware/globalErrorHandler";
 import { subscriptionRoutes } from "./modules/subscription/subscription.route";
@@ -20,9 +19,10 @@ app.use(
   }),
 );
 
-app.post("/api/subscription/webhook", express.raw({type: 'application/json'}), ()=>{
-  
-})
+app.post(
+  "/api/subscription/webhook",
+  express.raw({ type: "application/json" }),
+);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
