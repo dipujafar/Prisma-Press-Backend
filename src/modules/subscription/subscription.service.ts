@@ -1,6 +1,8 @@
+import Stripe from "stripe";
 import config from "../../config";
 import { prisma } from "../../lib/prisma";
 import { stripe } from "../../lib/stripe";
+import { handleChangeSubscription, handleCheckoutCompleted } from "./subscription.utils";
 
 const createCheckoutSession = async (userId: string) => {
   const transactionResult = await prisma.$transaction(async (tx) => {
@@ -50,7 +52,43 @@ const createCheckoutSession = async (userId: string) => {
   };
 };
 
-const handleWebhook = async (event: Buffer, signature: string) => {};
+const handleWebhook = async (payload: Buffer, signature: string) => {
+  const endpointSecret = config.stripe_webhook_secret;
+  const event = stripe.webhooks.constructEvent(
+    payload,
+    signature,
+    endpointSecret,
+  );
+
+  switch (event.type) {
+    case "checkout.session.completed":
+      // Occurs when a checkout session has been successfully completed.
+
+      const session: Stripe.Checkout.Session = event.data.object;
+
+      await handleCheckoutCompleted(session);
+
+      break;
+    case "customer.subscription.updated":
+      // Occurs whenever a  subscription changes (e.g. switching from one plan to another,  or changing the status from trial to active).
+
+      await handleChangeSubscription(event.data.object);
+
+      break;
+    case "customer.subscription.deleted":
+      // Occurs whenever a customer's subscription ends.
+
+      await handleChangeSubscription(event.data.object);
+
+      break;
+    default:
+      // Unexpected event type
+      console.log(`No events matched. Unhandled event type ${event.type}.`);
+      break;
+  }
+};
+
+
 
 export const subscriptionService = {
   createCheckoutSession,
