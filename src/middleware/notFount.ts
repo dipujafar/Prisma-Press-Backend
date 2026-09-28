@@ -5,6 +5,6 @@ export const notFound = (req: Request, res: Response) => {
     success: false,
     message: "API endpoint not found",
     path: req.originalUrl,
-    date: Date(),
+    date: new Date(),
   });
 }

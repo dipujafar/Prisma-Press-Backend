@@ -78,7 +78,9 @@ const getAllPosts = async (query: IPostQuery) => {
     });
   }
 
-
+  andConditions.push({
+    isPremium: false,
+  });
 
   const result = await prisma.post.findMany({
     // where: {
@@ -155,7 +157,21 @@ const getAllPosts = async (query: IPostQuery) => {
     },
   });
 
-  return result;
+  const total = await prisma.post.count({
+    where: {
+      AND: andConditions,
+    },
+  });
+
+  return {
+    data: result,
+    meta: {
+      page,
+      limit,
+      total,
+      totalPage: Math.ceil(total / limit),  
+    },
+  };
 };
 
 const getPostById = async (id: string) => {
@@ -172,7 +188,7 @@ const getPostById = async (id: string) => {
     // throw new Error("Error");
 
     const post = await tx.post.findUniqueOrThrow({
-      where: { id },
+      where: { id, isPremium: false },
       include: {
         author: {
           omit: {
